@@ -42,4 +42,7 @@ Método POST, es necesario el titulo y descripcion para poder dar el alta de la 
 Método PUT, es necesario el Id de la publicacion para saber que publicacion se va a modificar, es opcional titulo o descripcion, pero es obligatorio uno de los dos datos
 Método DELETE, es necesario solamente el id de la publicacion para eliminar dicha publicacion 
 
->>>>>>> 69afd520bf882f2e3330639e37a8472b5f7c3b08
+Utilizar de manera obligatoria tipo de dato Integer al momento de enviar la petición al registrar un usuario con su tipo de rol, ya que se encuentran algunas validaciones que hacen 
+con solamente datos integer, del 1 - 5
+
+Se llevaron a cabo algunos cambios en el script de SQL

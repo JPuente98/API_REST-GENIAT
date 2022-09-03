@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Buen día.
 
 Yo use como servidor local la herramienta XAMPP, para acceder a cada una de las rutas las separe por clases, por ejemplo publicaciones y usuarios.
@@ -22,3 +23,23 @@ Es necesario instalar composer, posterior a eso correr el siguiente comando en l
 
 Obligatorio usar la variable rol como Integer, ya que como string, tenemos una validación de un error, de igual manera si se intenta asignar un valor Integer menor a 1 o mayor a 5
 nos saltara un error, esto al momento de dar de alta un usuario, en el  metodo POST enla clase usuarios, los niveles de roles permitidos son los mencionados en los requerimientos.
+=======
+Buen día.
+
+Yo use como servidor local la herramienta XAMPP, para acceder a cada una de las rutas las separe por clases, por ejemplo publicaciones y usuarios.
+
+La clase de usuario cuenta con una sola petición (POST), la cual se encarga de dar el alta de los usuarios, donde son necesarios y obligatorios los siguientes datos: 
+
+- Nombre
+- Apellido
+- Correo
+- Rol
+
+La clase publicaciones cuenta con 4 peticiones, (GET, POST, DELETE Y PUT) donde se indica cada uno de los campos que necesitaa cada petición para funcionar de manera correcta: 
+
+Método GET, es cuestión de colocar en la URL de publicaciones al final ?page=x numero o ?id=x numero para buscar por pagina o por id de publicación.
+Método POST, es necesario el titulo y descripcion para poder dar el alta de la publicación
+Método PUT, es necesario el Id de la publicacion para saber que publicacion se va a modificar, es opcional titulo o descripcion, pero es obligatorio uno de los dos datos
+Método DELETE, es necesario solamente el id de la publicacion para eliminar dicha publicacion 
+
+>>>>>>> 69afd520bf882f2e3330639e37a8472b5f7c3b08

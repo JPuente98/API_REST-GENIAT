@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
@@ -122,5 +123,122 @@ ADD COLUMN `Fecha` DATETIME NOT NULL AFTER `Nombre_Completo`;
 
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+=======
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
+SET time_zone = "+00:00";
+
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+
+--
+-- Base de datos: `geniat-apirest`
+--
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Publicaciones`
+--
+
+CREATE TABLE `publicaciones` (
+  `PublicacionId` int(11) NOT NULL,
+  `UsuarioId` varchar(45) DEFAULT NULL,
+  `Titulo` varchar(45) DEFAULT NULL,
+  `Descripcion` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+--
+-- Estructura de tabla para la tabla `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `UsuarioId` int(11) NOT NULL,
+  `Nombre` varchar(45) DEFAULT NULL,
+  `Apellido` varchar(45) DEFAULT NULL,
+  `Correo` varchar(45) DEFAULT NULL,
+  `Password` varchar(45) DEFAULT NULL,
+  `Rol` varchar(45) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios`(`UsuarioId`, `Nombre`, `Apellido`, `Correo`, `Password`, `Rol`) VALUES
+(1, 'Juan', 'Zermeño', '1@gmail.com', '123456', 'alto'),
+(2, 'Miguel', 'Rodriguez', '2@gmail.com', '123456', 'medio'),
+(3, 'Donatello', 'Mendoza', '3@gmail.com', '123456', 'medioalto'),
+(4, 'Rafael', 'Alcazar', '4@gmail.com', '123456', 'basico'),
+(5, 'Marco', 'Mota', '5@gmail.com', '123456', 'altomedio');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuarios_token`
+--
+
+CREATE TABLE `usuarios_token` (
+  `TokenId` int(11) NOT NULL,
+  `UsuarioId` varchar(45) DEFAULT NULL,
+  `Token` varchar(45) DEFAULT NULL,
+  `Estado` varchar(45) CHARACTER SET armscii8 DEFAULT NULL,
+  `Fecha` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `publicaciones`
+--
+ALTER TABLE `publicaciones`
+  ADD PRIMARY KEY (`PublicacionId`);
+
+--
+-- Indices de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`UsuarioId`);
+
+--
+-- Indices de la tabla `usuarios_token`
+--
+ALTER TABLE `usuarios_token`
+  ADD PRIMARY KEY (`TokenId`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+--
+-- AUTO_INCREMENT de la tabla `publicaciones`
+--
+ALTER TABLE `publicaciones`
+  MODIFY `PublicacionId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `UsuarioId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios_token`
+--
+ALTER TABLE `usuarios_token`
+  MODIFY `TokenId` int(11) NOT NULL AUTO_INCREMENT;
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+>>>>>>> 69afd520bf882f2e3330639e37a8472b5f7c3b08
+1 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

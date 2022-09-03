@@ -9,6 +9,7 @@ class auth extends conexion
     {
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
+
         if(!isset($datos['correo']) || !isset($datos['password']))
         {
             //ERROR CON LOS CAMPOS
@@ -28,21 +29,19 @@ class auth extends conexion
                 {
 
                     //CREACIÓN DEL TOKEN
-                    $verificar = $this->insertarToken($datos[0]['Correo']);
 
-                    if($verificar)
+                    $id_usuario = $datos[0]['UsuarioId'];
+                    $WebToken = conexion::jwt($correo, $id_usuario);
+                    $verificar = $this->insertarToken($id_usuario, $WebToken);
+
+                    if($verificar == 0 || $verificar == 1)
                     {
                         $result = $_respuestas->response;
                         $result["result"] = array(
-                            "token" => $verificar
+                            "token" => $WebToken
                         );
                         return $result;
                     }   
-                    else
-                    {
-                        //ERROR AL GUARDAR
-                        return $_respuestas->error_500("Error interno, no hemos podido guardar");
-                    }
                 }   
                 else
                 {
@@ -54,6 +53,7 @@ class auth extends conexion
             {
                 return $_respuestas->error_200("El usuario con correo $correo no existe");
             }
+            
         }
     }
 
@@ -63,7 +63,7 @@ class auth extends conexion
 
         //HEREDANDO UN METÓDO DE LA CLASE PADRE QUE ES CONEXIÓN
         $datos = parent::obtenerDatos($query);
-        if(isset($datos[0]['UsuarioId']))
+        if(isset($datos[0]['Correo']))
         {
             return $datos;
         }
@@ -73,25 +73,29 @@ class auth extends conexion
         }
     }
 
-    private function insertarToken($correo)
+    private function insertarToken($id_usuario, $token)
     {
         $val = true;
 
-        //COMBINACIÓN DE DOS FUNCIONES DE PHP PARA GENERAR EL TOKEN CON VALORES RANDOM HEXADECIMALES
-        $token = bin2hex(openssl_random_pseudo_bytes(16, $val));
         $date = date("Y-m-d H:i");
         $estado = "Activo";
-        $query = "INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES('$correo', '$token', '$estado', '$date')";
-        $verificar = parent::nonQuery($query);
 
-        if($verificar)
+        $BuscaToken = "SELECT Token FROM usuarios_token WHERE UsuarioId = '$id_usuario'";
+        $ValidaToken = parent::nonQuery($BuscaToken);
+
+        if($ValidaToken == 0)
         {
-            return $token;
+            $query = "INSERT INTO usuarios_token (UsuarioId, Token, Estado, Fecha) VALUES('$id_usuario', '$token', '$estado', '$date')";
         }
         else
         {
-            return 0;
+            $query = "UPDATE usuarios_token SET Token = '$token', Estado = '$estado', Fecha = '$date' WHERE UsuarioId = '$id_usuario'";
         }
+
+        $verificar = parent::nonQuery($query);
+
+        return $ValidaToken;
+        
     }
 }
 

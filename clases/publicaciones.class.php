@@ -8,26 +8,70 @@ class publicaciones extends conexion
     private $table = "publicaciones";
     private $titulo = "";
     private $descripcion = "";
+    private $publicacionId = "";
+    private $usuarioId = "";
+    private $NombreCompleto = "";
+    private $rol = "";
 
-    public function listaPublicaciones($pagina = 1)
+    public function get($json)
     {
-        $inicio = 0;
-        $cantidad = 50;
+        $_respuestas = new respuestas;
+        $datos = json_decode($json, true);
 
-        if($pagina > 1)
+        $this->token = $datos['token'];
+        $arrayToken = $this->buscarToken();
+        $this->usuarioId = $arrayToken[0]['UsuarioId'];
+
+        if($arrayToken)
         {
-            $inicio = ($cantidad * ($pagina - 1)) + 1;
-            $cantidad = $cantidad * $pagina;
+            if($arrayToken[0]['Rol'] == 2 || $arrayToken[0]['Rol'] >= 4)
+            {
+                if(!isset($datos['publicacionId']))
+                {
+                    return $_respuestas->error_400();
+                }
+                else
+                {
+                    $this->publicacionId = $datos['publicacionId'];
+                    $resp = $this->obtenerPublicacion();
+        
+                    if($resp)
+                    {
+                        $respuesta = $_respuestas->response;
+                        $respuesta["result"] = array(
+                            "publicacionId" => $resp
+                        );
+                        return $respuesta;
+                    }
+                    else
+                    {
+                        return $_respuestas->error_401("No existe publicación con ese id");
+                    }
+                }
+            }
+            else
+            {
+                return $_respuestas->error_401("El usuario " .$arrayToken[0]['Nombre']." " .$arrayToken[0]['Apellido']. " No cuenta con los permisos para consultar");
+            }
         }
-
-        $query = "SELECT PublicacionId, UsuarioId, Titulo, Descripcion FROM " . $this->table . " limit $inicio, $cantidad";
-        $datos = parent::obtenerDatos($query);
-        return ($datos);
+        else
+        {
+            return $_respuestas->error_401("El Token que envio, es invalido o ha caducado");
+        }
     }
 
-    public function obtenerPublicacion($id)
+    public function obtenerPublicacion()
     {
-        $query = "SELECT * FROM " . $this->table . " WHERE PublicacionId = '$id'";
+        if($this->publicacionId == "")
+        {
+            $query = "SELECT * FROM " .$this->table;
+        }
+        else
+        {
+            $query = "SELECT * FROM " .$this->table. " WHERE PublicacionId = " .$this->publicacionId. "";
+        }
+
+        //print($query);
         return parent::obtenerDatos($query);
     }
 
@@ -36,24 +80,50 @@ class publicaciones extends conexion
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
 
-        if(!isset($datos['token']))
-        {
-            return $_respuestas->error_401();
-        }
-        else
-        {
-            $this->token = $datos['token'];
-            $arrayToken = $this->buscarToken();
+        $this->token = $datos['token'];
+        $arrayToken = $this->buscarToken();
+        $this->usuarioId = $arrayToken[0]['UsuarioId'];
 
-            if(!isset($datos['Titulo']) || !isset($datos['Descripcion']))
+        if($arrayToken)
+        {
+            if($arrayToken[0]['Rol'] >= 3)
+            {
+                if(!isset($datos['titulo']) || !isset($datos['descripcion']))
                 {
                     return $_respuestas->error_400();
                 }
                 else
                 {
-                    $this->titulo = $datos['Titulo'];
-                    $this->descripcion = $datos['Descripcion'];
+                    $this->titulo = $datos['titulo'];
+                    $this->descripcion = $datos['descripcion'];
+                    $this->NombreCompleto = $arrayToken[0]['Nombre']." ".$arrayToken[0]['Apellido'];
+                    $rol_numerico = $arrayToken[0]['Rol'];
 
+
+                    switch($rol_numerico)
+                    {
+                        case 1:
+                            $this->rol = "Básico";
+                            break;
+
+                        case 2:
+                            $this->rol = "Medio";
+                            break;
+
+                        case 3:
+                            $this->rol = "MedioAlto";
+                            break;
+
+                        case 4:
+                            $this->rol = "AltoMedio";
+                            break;
+
+                        case 5:
+                            $this->rol = "Alto";
+                            break;
+
+                    }
+    
                     $resp = $this->insertarPublicacion();
         
                     if($resp)
@@ -69,26 +139,24 @@ class publicaciones extends conexion
                         return $_respuestas->error_500();
                     }
                 }
-
-            /*if($arrayToken)
-            {
-                
             }
             else
             {
-                return $_respuestas->error_401("El Token que envio, es invalido o ha caducado");
+                return $_respuestas->error_401("El usuario " .$arrayToken[0]['Nombre']." " .$arrayToken[0]['Apellido']. " No cuenta con los permisos para publicar");
             }
-            */
         }
-
-       
+        else
+        {
+            return $_respuestas->error_401("El Token que envio, es invalido o ha caducado");
+        }
     }
 
     private function insertarPublicacion()
     {
-        $query = "INSERT INTO ".$this->table." (Titulo, Descripcion)
+        $date = date("Y-m-d H:i");
+        $query = "INSERT INTO ".$this->table." (UsuarioId, Titulo, Descripcion, Rol_usuario, Nombre_Completo, Fecha)
         VALUES
-        ('". $this->titulo . "','" . $this->descripcion . "')";
+        ('" .$this->usuarioId. "','" .$this->titulo. "','" .$this->descripcion. "','" .$this->rol."','" .$this->NombreCompleto. "','" .$date. "')";
         
         $resp = parent::nonQueryId($query);
         
@@ -108,58 +176,66 @@ class publicaciones extends conexion
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
 
-        if(!isset($datos['token']))
-        {
-            return $_respuestas->error_401();
-        }
-        else
-        {
-            $this->token = $datos['token'];
-            $arrayToken = $this->buscarToken();
+        $this->token = $datos['token'];
+        $arrayToken = $this->buscarToken();
 
-            if(!isset($datos['publicacionId']))
+        if($arrayToken)
+        {
+            if($arrayToken[0]['Rol'] >= 4)
             {
-                return $_respuestas->error_400();
-            }
-            else
-            {
-                $this->publicacionId = $datos['publicacionId'];
-                if(isset($datos['titulo'])){ $this->titulo; }
-                if(isset($datos['descripcion'])){ $this->descripcion; }
-
-                $resp = $this->modificarPublicacion();
-    
-                if($resp)
+                if(!isset($datos['publicacionId']))
                 {
-                    $respuesta = $_respuestas->response;
-                    $respuesta["result"] = array(
-                        "publicacionId" => $this->publicacionId
-                    );
-                    return $respuesta;
+                   return $_respuestas->error_400();
                 }
                 else
                 {
-                    return $_respuestas->error_500();
+                    $this->publicacionId = $datos['publicacionId'];
+                    if(isset($datos['titulo'])){$this->titulo = $datos['titulo'];} 
+                    if(isset($datos['descripcion'])){$this->descripcion = $datos['descripcion'];} 
+        
+                    $resp = $this->modificarPublicacion();
+        
+                    if(!$resp)
+                    {
+                        $respuesta = $_respuestas->response;
+                        $respuesta["result"] = array(
+                            "publicacionId" => $this->publicacionId
+                        );
+                        return $respuesta;
+                    }
+                    else
+                    {
+                        return $_respuestas->error_500();
+                    }
                 }
-            }
-
-            /*if($arrayToken)
-            {
-
             }
             else
             {
-                return $_respuestas->error_401("El Token que envio, es invalido o ha caducado");
+                return $_respuestas->error_401("El usuario " .$arrayToken[0]['Nombre']." " .$arrayToken[0]['Apellido']. " No cuenta con los permisos para actualizar");
             }
-            */
+        }
+        else
+        {
+            return $_respuestas->error_401("El Token que envio, es invalido o ha caducado");
         }
     }
 
     private function modificarPublicacion()
     {
-        $query = "UPDATE " .$this->table. " SET Titulo = '" .$this->titulo. "', Descripcion = '" .$this->descripcion. "' WHERE PublicacionId = '" .$this->publicacionId . "'";    
+        if(!$this->titulo)
+        {
+            $query = "UPDATE " .$this->table. " SET Descripcion = '" .$this->descripcion. "' WHERE PublicacionId = '" .$this->publicacionId . "'";    
+        }
+        else if(!$this->descripcion)
+        {
+            $query = "UPDATE " .$this->table. " SET Titulo = '" .$this->titulo. "' WHERE PublicacionId = '" .$this->publicacionId . "'";    
+        }
+        else
+        {
+            $query = "UPDATE " .$this->table. " SET Titulo = '" .$this->titulo. "', Descripcion = '" .$this->descripcion. "' WHERE PublicacionId = '" .$this->publicacionId . "'";  
+        }  
+        
         $resp = parent::nonQueryId($query); 
-        print_r($query);
         if($resp >= 1)
         {
             return $resp;
@@ -176,16 +252,12 @@ class publicaciones extends conexion
         $_respuestas = new respuestas;
         $datos = json_decode($json, true);
 
-        if(!isset($datos['token']))
-        {
-            return $_respuestas->error_401();
-        }
-        else
-        {
-            $this->token = $datos['token'];
-            $arrayToken = $this->buscarToken();
+        $this->token = $datos['token'];
+        $arrayToken = $this->buscarToken();
 
-            if($arrayToken)
+        if($arrayToken)
+        {
+            if($arrayToken[0]['Rol'] == 5)
             {
                 if(!isset($datos['publicacionId']))
                 {
@@ -212,8 +284,12 @@ class publicaciones extends conexion
             }
             else
             {
-                return $_respuestas->error_401("El Token que envio, es invalido o ha caducado");
+                return $_respuestas->error_401("El usuario " .$arrayToken[0]['Nombre']." " .$arrayToken[0]['Apellido']. " No cuenta con los permisos para eliminar");
             }
+        }
+        else
+        {
+            return $_respuestas->error_401("El Token que envio, es invalido o ha caducado");
         }
     }
 
@@ -236,9 +312,13 @@ class publicaciones extends conexion
 
     private function buscarToken()
     {
-        $query = "SELECT TokenId, UsuarioId, Estado FROM usuarios_token WHERE Token = '" .  $this->token . "' AND Estado = 'Activo'";
+        $query = "SELECT usuarios.Rol, usuarios_token.UsuarioId, usuarios.Nombre, usuarios.Apellido FROM usuarios 
+        INNER JOIN usuarios_token ON usuarios.UsuarioId = usuarios_token.UsuarioId 
+        WHERE usuarios_token.Token = '$this->token'";
+
         $resp = parent::obtenerDatos($query);
 
+        //print_r($resp);
 
         if($resp)
         {
@@ -269,3 +349,5 @@ class publicaciones extends conexion
 
 
 ?>
+
+

@@ -1,5 +1,8 @@
 <?php 
 
+require_once "vendor/autoload.php";
+use Firebase\JWT\JWT;
+
 class conexion
 {
     private $server;
@@ -48,6 +51,7 @@ class conexion
         {
             $resultArray[] = $key;
         }
+
         return $this->convertirUTF8($resultArray);
     }
 
@@ -86,6 +90,24 @@ class conexion
         }
     }
 
+    public function jwt($correo, $id_usuario)
+    {
+        $time = time();
+        $token = array(
 
+            //Tiempo en el que inicia el token
+            "iat" => $time,
+            //Tiempo de expiración del token (1 mes)
+            "exp" => $time + (60*60*24*30),
+            "data" => [
+                "correo" => $correo,
+                "usuarioid" => $id_usuario
+            ]
+      );
+
+      $jwt = JWT::encode($token, "adfopkepokgkfmdfgdfgdg", "HS256");
+
+      return $jwt;
+    }
 }
 ?>

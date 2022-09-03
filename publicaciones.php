@@ -8,7 +8,27 @@ $_publicaciones = new publicaciones;
 
 if($_SERVER['REQUEST_METHOD'] == "GET")
 {
-    if(isset($_GET["page"]))
+     //RECIBIMOS LOS DATOS ENVIADOS
+     $postBody = file_get_contents("php://input");
+
+     //ENVIAMOS LOS DATOS AL MANEJADOR
+     $datosArray = $_publicaciones->get($postBody);
+     
+     //DEVOLVEMOS UNA RESPUESTA
+     header("Content-Type: application/json");
+     if(isset($datosArray["result"]["error_id"]))
+     {
+         $responseCode = $datosArray["result"]["error_id"];
+         http_response_code($responseCode);
+     }
+     else
+     {
+         http_response_code(200);
+     }
+     echo json_encode($datosArray);
+
+
+    /*if(isset($_GET["page"]))
     {
         $pagina = $_GET["page"];
         $listaPublicaciones = $_publicaciones->listaPublicaciones($pagina);
@@ -23,7 +43,7 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
         header("Content-Type: application/json");
         echo json_encode($datosPublicacion);
         http_response_code(200);
-    }
+    }*/
 }
 else if($_SERVER['REQUEST_METHOD'] == "POST")
 {

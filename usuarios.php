@@ -4,6 +4,7 @@ require_once "clases/usuarios.class.php";
 require_once "clases/respuestas.class.php";
 
 $_usuarios = new usuarios;
+$_respuestas = new respuestas;
 
 if($_SERVER['REQUEST_METHOD'] == "POST")
 {

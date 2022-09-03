@@ -46,3 +46,5 @@ Utilizar de manera obligatoria tipo de dato Integer al momento de enviar la peti
 con solamente datos integer, del 1 - 5
 
 Se llevaron a cabo algunos cambios en el script de SQL
+
+Es necesario instalar composer, una vez que se instala con el comando composer require firebase/php-jwt, esto para crear los JWToken, se hace directamente en la carpeta raíz del proyecto
